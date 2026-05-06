@@ -1,0 +1,86 @@
+═══════════════════════════════════════════════════════════
+  RAG PROJECT — COMANDOS DE ARRANQUE
+═══════════════════════════════════════════════════════════
+
+──────────────────────────────────────────────
+  OPCIÓN A: SIN DOCKER (desarrollo local)
+  Necesitas dos terminales abiertas a la vez
+──────────────────────────────────────────────
+
+  [TERMINAL 1 — Backend]
+  cd ~/Documentos/Projecto-rag/backend
+  conda activate rag-backend
+  uvicorn app.main:app --reload --port 8000
+
+  [TERMINAL 2 — Frontend]
+  cd ~/Documentos/Projecto-rag/frontend
+  conda activate rag-frontend
+  chainlit run app.py --port 8080
+
+  Accede en el navegador a: http://localhost:8080
+  API docs en:              http://localhost:8000/docs
+
+──────────────────────────────────────────────
+  OPCIÓN B: CON DOCKER (recomendado)
+──────────────────────────────────────────────
+
+  REQUISITO PREVIO: tener Docker Desktop instalado y arrancado.
+
+  [Paso 1] Crear el archivo .env con tu clave de Groq
+  cd ~/Documentos/Projecto-rag
+  cp .env.example .env
+  nano .env
+    → escribe tu clave: GROQ_API_KEY=gsk_xxxxxxxxxxxxxxx
+    → guarda con Ctrl+O, sal con Ctrl+X
+
+  [Paso 2] Construir y arrancar todos los contenedores
+  cd ~/Documentos/Projecto-rag
+  docker compose up --build
+
+  [Paso 2 alternativo — en segundo plano]
+  docker compose up --build -d
+
+  Accede en el navegador a: http://localhost:8080
+  API docs en:              http://localhost:8000/docs
+
+──────────────────────────────────────────────
+  COMANDOS ÚTILES DE DOCKER
+──────────────────────────────────────────────
+
+  Ver logs en tiempo real:
+  docker compose logs -f
+
+  Ver logs solo del backend:
+  docker compose logs -f backend
+
+  Ver logs solo del frontend:
+  docker compose logs -f frontend
+
+  Parar todos los contenedores:
+  docker compose down
+
+  Parar y eliminar volúmenes (borra ChromaDB):
+  docker compose down -v
+
+  Ver estado de los contenedores:
+  docker compose ps
+
+  Reconstruir solo un servicio:
+  docker compose up --build backend
+  docker compose up --build frontend
+
+──────────────────────────────────────────────
+  PRIMERA VEZ QUE ARRANCA
+──────────────────────────────────────────────
+
+  La primera vez tardará varios minutos porque:
+  1. Docker descarga las imágenes base de Python
+  2. pip instala todas las dependencias dentro del contenedor
+  3. El backend descarga el modelo de embeddings
+     all-MiniLM-L6-v2 desde Hugging Face (~90 MB)
+  4. El backend indexa el artículo en ChromaDB
+
+  Las siguientes veces arranca en segundos porque
+  ChromaDB queda guardado en ./data/chroma_db/
+
+═══════════════════════════════════════════════════════════
