@@ -1,0 +1,38 @@
+version: "3.9"
+
+services:
+
+  # ── Backend: FastAPI + LangGraph Agent ──────────────────────────
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: rag_backend
+    env_file:
+      - .env
+    volumes:
+      # ChromaDB persiste entre reinicios
+      - ./data/chroma_db:/app/data/chroma_db
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    restart: unless-stopped
+
+  # ── Frontend: Chainlit ───────────────────────────────────────────
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: rag_frontend
+    environment:
+      - BACKEND_URL=http://backend:8000
+    ports:
+      - "8080:8080"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
