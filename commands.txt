@@ -37,6 +37,10 @@
   cd ~/Documentos/Projecto-rag
   docker compose up --build
 
+  [Bajar contenedores forzado para evitar error]
+  docker rm -f rag_backend rag_frontend
+  docker compose up --build
+  
   [Paso 2 alternativo — en segundo plano]
   docker compose up --build -d
 
